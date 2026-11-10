@@ -7,6 +7,7 @@ A version-controlled, **client-approval-pending** go-to-market and celebration a
 ## Client wiki
 - [Client brief & verification ledger](docs/clients/ocean-wave-vip/CLIENT_BRIEF.md)
 - [Transactional keyword strategy](docs/clients/ocean-wave-vip/KEYWORDS.md)
+- [SeaSky competitor keyword-gap intelligence — Nov 2026 exports](docs/clients/ocean-wave-vip/SEASKY_COMPETITOR_KEYWORD_GAP.md)
 - [Appointment booking & charter quote funnel](docs/clients/ocean-wave-vip/GTM_FUNNEL.md)
 - [Social campaign playbook](docs/clients/ocean-wave-vip/SOCIAL_CAMPAIGNS.md)
 - [Content bible](docs/clients/ocean-wave-vip/CONTENT_BIBLE.md)
