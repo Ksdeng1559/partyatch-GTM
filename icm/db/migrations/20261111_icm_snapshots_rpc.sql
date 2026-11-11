@@ -36,6 +36,11 @@ begin
  v_rev=(p_run->>'version')::bigint;
  if v_campaign is null or length(v_campaign) not between 3 and 80 or v_rev < 1 then raise exception 'Invalid run'; end if;
  if p_run->>'status' <> 'active' then raise exception 'New run must be active'; end if;
+ if (p_run->'budget'->>'capCents')::bigint < 0
+    or (p_run->'budget'->>'spentCents')::bigint < 0
+    or (p_run->'budget'->>'reservedCents')::bigint < 0
+    or (p_run->'budget'->>'spentCents')::bigint + (p_run->'budget'->>'reservedCents')::bigint > (p_run->'budget'->>'capCents')::bigint
+ then raise exception 'Invalid initial budget'; end if;
  if jsonb_array_length(p_run->'events') < 1 then raise exception 'Event evidence missing'; end if;
  insert into public.icm_workflow_snapshots(id,tenant_id,campaign_id,revision,status,state)
  values(v_id,p_tenant,v_campaign,v_rev,'active',p_run);
@@ -69,6 +74,8 @@ begin
  then raise exception 'Immutable run identity mismatch'; end if;
  v_new_revision=(p_run->>'version')::bigint;
  if v_new_revision<=p_expected_revision then raise exception 'Revision must increase'; end if;
+ if p_run->>'status' not in ('active','completed','cancelled') then raise exception 'Invalid workflow status'; end if;
+ if (p_run->>'campaignId') <> v_prev.campaign_id then raise exception 'Campaign identity changed'; end if;
  if (p_run->'budget'->>'spentCents')::bigint < 0
     or (p_run->'budget'->>'reservedCents')::bigint < 0
     or (p_run->'budget'->>'spentCents')::bigint + (p_run->'budget'->>'reservedCents')::bigint > (p_run->'budget'->>'capCents')::bigint
@@ -76,7 +83,10 @@ begin
  if jsonb_typeof(p_run->'events')<>'array'
     or jsonb_array_length(p_run->'events')<=jsonb_array_length(v_prev.state->'events')
  then raise exception 'Event history must grow'; end if;
- if (p_run->'events')::jsonb -> 0 <> (v_prev.state->'events')::jsonb -> 0 then raise exception 'Event prefix mismatch'; end if;
+ if exists (
+    select 1 from jsonb_array_elements(v_prev.state->'events') with ordinality as old_e(value,idx)
+    where old_e.value is distinct from (p_run->'events')->(old_e.idx::int - 1)
+ ) then raise exception 'Existing audit events cannot be rewritten'; end if;
  update public.icm_workflow_snapshots
  set state=p_run,revision=v_new_revision,status=p_run->>'status',updated_at=now()
  where tenant_id=p_tenant and id=p_id;
