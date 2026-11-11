@@ -38,16 +38,22 @@ function recalc(run) {
   }
   if(STAGES.every(s=>run.stages[s.id].status==='completed')){run.status='completed';event(run,'workflow_completed','icm');}
 }
-export function createRun({campaignId,segment,format,platform,sourceRefs=[],maxBudgetCents=0,idempotencyKey,createdBy='operator'}={}){
+export function createRun({campaignId,segment,format,platform,sourceRefs=[],maxBudgetCents=0,idempotencyKey,createdBy='operator',briefSeed=null}={}){
   assert(typeof campaignId==='string'&&/^[a-z0-9][a-z0-9_-]{2,79}$/i.test(campaignId),'Invalid campaignId');
   assert(typeof segment==='string'&&segment.length>0&&segment.length<100,'segment required');
   assert(typeof format==='string'&&format.length>0&&format.length<100,'format required');
   assert(typeof platform==='string'&&platform.length>0&&platform.length<100,'platform required');
   assert(Number.isSafeInteger(maxBudgetCents)&&maxBudgetCents>=0,'Budget must be a nonnegative integer in cents');
   assert(Array.isArray(sourceRefs)&&sourceRefs.every(s=>typeof s==='string'&&s.length<500),'sourceRefs must be strings');
+  if(briefSeed!==null){
+    assert(typeof briefSeed==='object' && !Array.isArray(briefSeed),'Invalid creative brief seed');
+    assert(typeof briefSeed.id==='string' && briefSeed.id.length<=100,'Brief ID is required');
+    assert(typeof briefSeed.topic==='string' && briefSeed.topic.length<=200,'Brief topic is required');
+    assert(typeof briefSeed.handoffSchema==='string' && briefSeed.handoffSchema.length<=100,'Handoff schema is required');
+  }
   const t=now();
   const run={id:randomUUID(),workflowVersion:WORKFLOW_VERSION,version:0,status:'active',campaignId,segment,format,platform,
-    sourceRefs:copy(sourceRefs),idempotencyKey:idempotencyKey||null,createdAt:t,updatedAt:t,createdBy,
+    sourceRefs:copy(sourceRefs),briefSeed:briefSeed===null?null:copy(briefSeed),idempotencyKey:idempotencyKey||null,createdAt:t,updatedAt:t,createdBy,
     budget:{capCents:maxBudgetCents,reservedCents:0,spentCents:0,currency:'CAD'},
     stages:Object.fromEntries(STAGES.map(s=>[s.id,{status:'pending',attempts:0,output:null,approval:null,providerJobId:null,receipts:[]}])),
     events:[]};
