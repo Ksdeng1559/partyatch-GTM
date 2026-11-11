@@ -1,12 +1,15 @@
 #!/usr/bin/env node
 /** Safe single-user demo CLI. Records workflow state; never calls external providers. */
 import {DemoFileStore} from './demo-store.mjs';
+import {storeFromEnvironment} from './supabase-store.mjs';
 import {validateCreativeHandoff} from './handoff.mjs';
 import {readFile} from 'node:fs/promises';
 import {startStage,completeStage,approveStage,recordPublication,failStage,retryStage,cancelRun,getStatus} from './engine.mjs';
 const [, , command, ...rest]=process.argv;
 const args=Object.fromEntries(rest.filter(s=>s.startsWith('--')&&s.includes('=')).map(s=>{const i=s.indexOf('=');return [s.slice(2,i),s.slice(i+1)];}));
-const store=new DemoFileStore(process.env.ICM_STORE||'.icm-local-runs');
+const store=process.env.ICM_STORE_BACKEND==='supabase'
+  ? storeFromEnvironment()
+  : new DemoFileStore(process.env.ICM_STORE||'.icm-local-runs');
 const required=(key)=>{if(!args[key])throw new Error(`Missing --${key}=...`);return args[key];};
 async function main(){
  if(command==='import-creative'){
