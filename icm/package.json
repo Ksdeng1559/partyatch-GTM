@@ -1,0 +1,14 @@
+{
+  "name": "oceanwave-icm-content-orchestrator",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Local dry-run ICM orchestration for Ocean Wave content-to-booking GTM",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "icm": "node src/cli.mjs"
+  }
+}
