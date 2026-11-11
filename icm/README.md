@@ -133,3 +133,34 @@ The Content Bible's editorial pillars are occasion inspiration (35%), vessel/tru
 The directory/rank-and-rent concept is **independently branded** and separate from client charter booking promises; this ICM content runtime coordinates Ocean Wave marketing drafts only. An operator-approved affiliate creative workflow may be planned later but cannot misrepresent unaffiliated operators.
 
 **Next engineering gate:** run automated tests, validate schema in staging, create secure transition RPC, then integrate the VideoAd workbench as an ICM client. Never treat this documentation as deployed integrations.
+
+## Supabase-backed workflow persistence (new adapter — staged, not deployed)
+
+`src/supabase-store.mjs` implements a server-only workflow repository that uses **Supabase REST RPC**. The `20261111_icm_snapshots_rpc.sql` reference migration provisions an isolated, tenant-scoped `icm_workflow_snapshots` table with RLS enabled and service-role-only `icm_snapshot_create/get/cas` functions. Each update checks the expected revision under a PostgreSQL row lock, preserving existing audit-event entries and budget invariants. This makes stage-state changes durable and prevents stale concurrent updates. It does **not** yet authenticate human approvers or integrate with live providers.
+
+### Secure configuration
+
+Set server/CLI environment variables (never commit or expose in a browser):
+
+```bash
+ICM_STORE_BACKEND=supabase
+SUPABASE_URL=https://YOUR_APPROVED_PROJECT_REF.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SERVER_ONLY_SERVICE_ROLE_JWT
+ICM_TENANT_ID=YOUR_EXISTING_TENANT_UUID
+```
+
+Use a **server-side legacy service-role JWT compatible with the REST Bearer header** for this adapter; new Supabase secret API key formats need separate authentication handling rather than assuming they are JWTs. Store credentials in a protected secret manager. `ICM_TENANT_ID` must come from a **trusted server tenant binding**, never a user's browser request. The local CLI `--actor` is not an authentication mechanism.
+
+**Deployment boundaries:** The connected Supabase account has no project clearly dedicated to Ocean Wave VIP. Do not run this migration on LeadSniper, Urban Mining or Mortgage databases without explicit target selection and tenancy design. The migration file is not applied by merging GitHub code. First validate the SQL in an isolated staging database, check PostgreSQL/RLS grants, then configure the CLI or a backend worker.
+
+### Quick validation
+
+```bash
+cd icm
+npm test
+# After explicit target project migration + server environment provisioning:
+node src/cli.mjs init --campaign=owvip-romance-001 --segment=romance --format=microdrama --platform=instagram --budget=0 --actor=internal-operator
+node src/cli.mjs status --id=UUID_FROM_PREVIOUS_COMMAND
+```
+
+The existing `import-creative`, `start`, `complete`, `approve`, `fail`, `retry`, `cancel` and `record-publication` commands all use the configured store. This is **not a public web API** and does not communicate with Higgsfield, Krea, social platforms or the booking system. Production still requires authenticated operator identity, a per-tenant role/approval ledger, work queue, provider adapter signatures, verification that external actions actually happened and an audited migration procedure. No automated posting or paid generation.
