@@ -13,6 +13,11 @@ A version-controlled, **client-approval-pending** go-to-market and celebration a
 - [Competitor/social listening and 30-day roadmap](docs/clients/ocean-wave-vip/INTELLIGENCE_AND_ROADMAP.md)
 - [Wiki home and source register](docs/clients/ocean-wave-vip/README.md)
 
+
+## ICM content orchestration (local implementation)
+
+The [Ocean Wave ICM runtime](icm/README.md) provides a **Node.js dependency-aware content workflow engine** with human rights/creative/quality approval stages, budget reservations, evidence receipts, an event log, local demo CLI, tests, and a fail-closed Supabase reference migration. It coordinates the Content Bible → LeadOS segmentation → Viral Engine brief → Higgsfield/Krea concept/production → QA → publishing record → measurement sequence. The external providers, live Supabase RPC, actual publishing and booking APIs are **not connected or deployed**; default output is a human-controlled draft. Run `cd icm && npm test` to verify the state-machine contract.
+
 ## Demo
 Open [index.html](index.html) locally, or use the same source at [apps/ocean-wave-vip-preview/index.html](apps/ocean-wave-vip-preview/index.html). The prototype lets users select an occasion, choose a quote request vs consultation route, and enter *demo-only* details. **The fields do not transmit data.** The page has noindex directives; GitHub Pages would require separate setup and is not configured by this branch.
 

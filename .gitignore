@@ -1,0 +1,7 @@
+.icm-local-runs/
+**/.icm-local-runs/
+.env
+.env.*
+!.env.example
+node_modules/
+.DS_Store

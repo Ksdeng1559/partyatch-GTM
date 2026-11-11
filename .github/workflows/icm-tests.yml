@@ -1,0 +1,29 @@
+name: ICM Workflow Engine Tests
+on:
+  push:
+    paths:
+      - 'icm/**'
+      - '.github/workflows/icm-tests.yml'
+  pull_request:
+    paths:
+      - 'icm/**'
+      - '.github/workflows/icm-tests.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check ICM source syntax
+        run: |
+          node --check icm/src/engine.mjs
+          node --check icm/src/demo-store.mjs
+          node --check icm/src/cli.mjs
+      - name: Test deterministic ICM state machine
+        working-directory: icm
+        run: npm test

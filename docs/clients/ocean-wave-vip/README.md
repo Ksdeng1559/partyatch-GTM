@@ -10,6 +10,8 @@
 - [04 — Social campaign portfolio & activation](SOCIAL_CAMPAIGNS.md)
 - [05 — Creative/content bible](CONTENT_BIBLE.md)
 - [06 — Evidence, competitor/social listening & 30-day roadmap](INTELLIGENCE_AND_ROADMAP.md)
+
+- [07 — ICM Content-to-Lead Orchestrator: runnable local engine, tests and Supabase schema](../../../icm/README.md)
 - [Non-submitting preview](../../../apps/ocean-wave-vip-preview/README.md)
 
 ## Business objective
