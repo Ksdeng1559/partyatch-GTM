@@ -26,6 +26,8 @@ create table if not exists public.icm_campaign_runs (
   constraint icm_idempotency_scope unique (tenant_id, idempotency_key)
 );
 create index if not exists icm_runs_tenant_status on public.icm_campaign_runs (tenant_id, workflow_status, created_at desc);
+-- Establish composite uniqueness BEFORE creating tenant-bound foreign keys.
+alter table public.icm_campaign_runs add constraint icm_runs_id_tenant_unique unique (id,tenant_id);
 
 create table if not exists public.icm_stage_runs (
   run_id uuid not null references public.icm_campaign_runs(id) on delete cascade,
@@ -43,8 +45,6 @@ create table if not exists public.icm_stage_runs (
   primary key(run_id, stage_id),
   foreign key (run_id,tenant_id) references public.icm_campaign_runs(id,tenant_id) on delete cascade
 );
--- Composite key needed for tenant-safe children.
-alter table public.icm_campaign_runs add constraint icm_runs_id_tenant_unique unique (id,tenant_id);
 create index if not exists icm_stage_status on public.icm_stage_runs (tenant_id, status);
 
 create table if not exists public.icm_approval_decisions (
