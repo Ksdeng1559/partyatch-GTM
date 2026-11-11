@@ -9,6 +9,7 @@ A version-controlled, **client-approval-pending** go-to-market and celebration a
 - [Transactional keyword strategy](docs/clients/ocean-wave-vip/KEYWORDS.md)
 - [Appointment booking & charter quote funnel](docs/clients/ocean-wave-vip/GTM_FUNNEL.md)
 - [Social campaign playbook](docs/clients/ocean-wave-vip/SOCIAL_CAMPAIGNS.md)
+- [LinkedIn B2B & Partnership GTM](docs/clients/ocean-wave-vip/LINKEDIN_B2B_PARTNERSHIP_GTM.md)
 - [Content bible](docs/clients/ocean-wave-vip/CONTENT_BIBLE.md)
 - [Competitor/social listening and 30-day roadmap](docs/clients/ocean-wave-vip/INTELLIGENCE_AND_ROADMAP.md)
 - [Wiki home and source register](docs/clients/ocean-wave-vip/README.md)
