@@ -3,6 +3,7 @@ export const HANDOFF_SCHEMA='klicksmartai.oceanwave.icm-handoff.v1';
 const FORMAT=new Set(['ugc','microdrama','authentic','carousel','explainer','stories']);
 const SEGMENTS=new Set(['romance','birthdays','stag','corporate','visitors','management','repair']);
 const PLATFORMS=new Set(['instagram','tiktok','youtube','facebook']);
+const LANGUAGES=new Set(['en-CA','zh-Hans','zh-Hant','pa','tl','hi','ko','es','fr-CA']);
 function check(ok,message){if(!ok)throw new Error(`Handoff validation: ${message}`);}
 function safeText(value,max,label){
  check(typeof value==='string'&&value.trim().length>0&&value.length<=max,`${label} must be nonempty text <= ${max} characters`);
@@ -26,6 +27,9 @@ export function validateCreativeHandoff(data){
  check(SEGMENTS.has(i.segment),'unknown audience segment');
  check(FORMAT.has(i.format),'unknown content format');
  check(PLATFORMS.has(i.platform),'unknown social channel');
+ const language=i.language||'en-CA';
+ check(LANGUAGES.has(language),'unsupported locale');
+ check(!c.language || c.language===language,'creative and ICM locale mismatch');
  check(i.maxBudgetCents===0,'imports must start with a zero budget');
  safeText(c.id,100,'creative.id');safeText(c.topic,200,'topic');safeText(c.hook,500,'hook');
  safeText(c.cta,200,'cta');safeText(c.script,12000,'script');safeText(c.leadMagnet,200,'lead magnet');
@@ -43,6 +47,7 @@ export function validateCreativeHandoff(data){
   briefSeed:{
    id:c.id,topic:c.topic,hook:c.hook,cta:c.cta,script:c.script,
    storyboard:[...c.storyboard],leadMagnet:c.leadMagnet,
+   language,translationStatus:language==='en-CA'?'SOURCE_ENGLISH':'DRAFT_NEEDS_NATIVE_REVIEW',
    handoffSchema:HANDOFF_SCHEMA,importedStatus:'UNREVIEWED_DRAFT',
    sourceApp:data.origin.app,sourceCreatedAt:data.origin.createdAt||null
   }
