@@ -47,6 +47,31 @@ flowchart TD
 
 **Not implemented:** live trend retrieval, real LeadOS/viral API calls, Higgsfield/Krea generation, binary asset storage, external webhooks, production queue, supplier authentication, multi-process locking, billing, publishing, scheduler, DMs, social metrics, end-to-end CRM, quote booking flow or production SQL transaction functions.
 
+
+## Offline handoff from the Social & UGC Content Factory (implemented)
+
+The [VideoAd Agent Social / UGC Factory draft PR #3](https://github.com/Ksdeng1559/Klicksmartai.VideoAd.Agent/pull/3) now has an **Export to ICM (offline)** button. It creates a portable JSON file using the strict `klicksmartai.oceanwave.icm-handoff.v1` contract, including audience, channel, format, topic, hook, working script, storyboards, CTA, lead magnet and original Notion Content Bible references. It includes no audience/customer PII, API key, source footage or permission to spend or publish.
+
+Local handoff instructions:
+
+1. In the VideoAd Agent, open **Social / UGC Factory**, select a pilot idea, segment, format and platform, then click **Export to ICM (offline)**.
+2. Save the generated file locally and open a terminal in this repository's `icm/` directory.
+3. Run:
+
+```bash
+node src/cli.mjs import-creative --file=/absolute/path/to/owvip-romance-microdrama-a-icm-handoff.json --actor=producer
+```
+
+The importer validates schema version, campaign identifier, creative/ICM metadata agreement, known segments/formats/platforms, trusted-source URL shape, **zero starting budget**, and explicit false approval/publishing/payment flags. Invalid packages are rejected. Successful imports create a new single-writer local run, retain the working creative as an **unreviewed brief seed**, and start with **research ready**, not an implicitly approved brief. Rights, creative and quality approvals are still mandatory. The `createdBy` actor is self-declared in this local demo, not authenticated.
+
+```bash
+node src/cli.mjs status --id=<returned-run-uuid>
+node src/cli.mjs start --id=<returned-run-uuid> --stage=research --actor=researcher
+node src/cli.mjs complete --id=<returned-run-uuid> --stage=research --actor=researcher --receipt=test://dated-research
+```
+
+The intake is a **file exchange**, not a running inter-repository API or Supabase service. Duplicate file imports create separate demo runs; production must implement durable idempotency, matching campaign identity and atomic insertion. The CLI accepts only a planning document. It never calls Higgsfield, Krea, a social network or an operator payment endpoint.
+
 ## Local demo
 
 Requires Node.js 20+; no npm install or credentials needed for the engine.
